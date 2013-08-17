@@ -542,6 +542,7 @@ void Workbench::activated()
         "PartDesign_NewSketch",
         "PartDesign_Pad",
         "PartDesign_Pocket",
+        "PartDesign_Hole",
         "PartDesign_Revolution",
         "PartDesign_Groove",
         0};
@@ -659,6 +660,7 @@ Gui::MenuItem* Workbench::setupMenuBar() const
           << "Separator"
           << "PartDesign_Pad"
           << "PartDesign_Pocket"
+          << "PartDesign_Hole"
           << "PartDesign_Revolution"
           << "PartDesign_Groove"
           << "PartDesign_Fillet"
@@ -706,6 +708,7 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
           << "Separator"
           << "PartDesign_Pad"
           << "PartDesign_Pocket"
+          << "PartDesign_Hole"
           << "PartDesign_Revolution"
           << "PartDesign_Groove"
           << "PartDesign_Fillet"

@@ -32,6 +32,7 @@
 #include "FeaturePad.h"
 #include "FeatureSolid.h"
 #include "FeaturePocket.h"
+#include "FeatureHole.h"
 #include "FeatureFillet.h"
 #include "FeatureSketchBased.h"
 #include "FeatureRevolution.h"

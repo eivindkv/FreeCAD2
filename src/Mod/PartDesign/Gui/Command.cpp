@@ -1139,6 +1139,41 @@ bool CmdPartDesignPocket::isActive(void)
 }
 
 //===========================================================================
+// PartDesign_Pocket
+//===========================================================================
+DEF_STD_CMD_A(CmdPartDesignHole);
+
+CmdPartDesignHole::CmdPartDesignHole()
+  : Command("PartDesign_Hole")
+{
+    sAppModule    = "PartDesign";
+    sGroup        = QT_TR_NOOP("PartDesign");
+    sMenuText     = QT_TR_NOOP("Hole");
+    sToolTipText  = QT_TR_NOOP("create a hole with the selected sketch");
+    sWhatsThis    = sToolTipText;
+    sStatusTip    = sToolTipText;
+    sPixmap       = "PartDesign_Hole";
+}
+
+void CmdPartDesignHole::activated(int iMsg)
+{
+    Part::Part2DObject* sketch;
+    std::string FeatName;
+    prepareSketchBased(this, "Hole", sketch, FeatName);
+    if (FeatName.empty()) return;
+
+    doCommand(Doc,"App.activeDocument().%s.Length = 5.0",FeatName.c_str());
+
+    finishSketchBased(this, sketch, FeatName);
+    adjustCameraPosition();
+}
+
+bool CmdPartDesignHole::isActive(void)
+{
+    return hasActiveDocument();
+}
+
+//===========================================================================
 // PartDesign_Revolution
 //===========================================================================
 DEF_STD_CMD_A(CmdPartDesignRevolution);
@@ -1923,6 +1958,7 @@ void CreatePartDesignCommands(void)
 
     rcCmdMgr.addCommand(new CmdPartDesignPad());
     rcCmdMgr.addCommand(new CmdPartDesignPocket());
+    rcCmdMgr.addCommand(new CmdPartDesignHole());
     rcCmdMgr.addCommand(new CmdPartDesignRevolution());
     rcCmdMgr.addCommand(new CmdPartDesignGroove());
 
