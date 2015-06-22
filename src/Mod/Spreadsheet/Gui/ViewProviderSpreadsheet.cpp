@@ -46,6 +46,7 @@
 #include <Base/Console.h>
 #include <sstream>
 
+using namespace Base;
 using namespace Gui;
 using namespace SpreadsheetGui;
 using namespace Spreadsheet;

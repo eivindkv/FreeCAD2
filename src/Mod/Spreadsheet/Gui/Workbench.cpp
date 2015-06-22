@@ -40,6 +40,7 @@
 #include "Mod/Spreadsheet/App/Range.h"
 #include "Mod/Spreadsheet/Gui/SpreadsheetView.h"
 
+using namespace Base;
 using namespace SpreadsheetGui;
 using namespace Spreadsheet;
 

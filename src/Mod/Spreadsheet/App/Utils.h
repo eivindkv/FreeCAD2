@@ -82,14 +82,6 @@ protected:
     short _col;
 };
 
-template<typename T> T * freecad_dynamic_cast(Base::BaseClass * t)
-{
-    if (t && t->isDerivedFrom(T::getClassTypeId()))
-        return static_cast<T*>(t);
-    else
-        return 0;
-}
-
 }
 
 #endif // UTILS_H

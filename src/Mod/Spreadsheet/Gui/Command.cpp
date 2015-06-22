@@ -43,6 +43,7 @@
 
 using namespace SpreadsheetGui;
 using namespace Spreadsheet;
+using namespace Base;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
