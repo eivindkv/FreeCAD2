@@ -13,6 +13,7 @@ include_directories(
     ${PYTHON_INCLUDE_PATH}
     ${XERCESC_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
+    ${QT_QTCORE_INCLUDE_DIR}
 )
 link_directories(${OCC_LIBRARY_DIR})
 

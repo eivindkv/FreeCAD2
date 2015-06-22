@@ -11,6 +11,7 @@ include_directories(
     ${ZLIB_INCLUDE_DIR}
     ${QT_INCLUDE_DIR}
     ${XERCESC_INCLUDE_DIR}
+    ${QT_QTCORE_INCLUDE_DIR}
 )
 
 set(PointsGui_LIBS

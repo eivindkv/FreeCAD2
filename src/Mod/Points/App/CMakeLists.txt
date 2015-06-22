@@ -17,6 +17,7 @@ include_directories(
     ${PYTHON_INCLUDE_PATH}
     ${XERCESC_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
+    ${QT_QTCORE_INCLUDE_DIR}
 )
 
 set(Points_LIBS
