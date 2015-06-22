@@ -12,6 +12,7 @@ include_directories(
     ${QT_INCLUDE_DIR}
     ${QT_QTCORE_INCLUDE_DIR}
     ${XercesC_INCLUDE_DIRS}
+    ${QT_QTCORE_INCLUDE_DIR}
 )
 
 set(PointsGui_LIBS
