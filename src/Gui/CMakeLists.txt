@@ -195,6 +195,7 @@ set(Gui_MOC_HDRS
     DockWindow.h
     DockWindowManager.h
     EditorView.h
+    DlgExpressionInput.h
     FileDialog.h
     Flag.h
     GraphicsViewZoom.h
@@ -218,6 +219,7 @@ set(Gui_MOC_HDRS
     PythonEditor.h
     QuantitySpinBox.h
     QListWidgetCustom.h
+    QuantitySpinBox_p.h
     ReportView.h
     SceneInspector.h
     SelectionView.h
@@ -297,6 +299,7 @@ SET(Gui_UIC_SRCS
     DlgLocationPos.ui
     DownloadManager.ui
     DownloadItem.ui
+    DlgExpressionInput.ui
     MouseButtons.ui
     SceneInspector.ui
     InputVector.ui
@@ -356,6 +359,7 @@ SET(Dialog_CPP_SRCS
     DlgProjectUtility.cpp
     DlgPropertyLink.cpp
     DlgTipOfTheDayImp.cpp
+    DlgExpressionInput.cpp
     TaskDlgRelocation.cpp
     DlgUndoRedo.cpp
     InputVector.cpp
@@ -386,6 +390,7 @@ SET(Dialog_HPP_SRCS
     DlgProjectUtility.h
     DlgPropertyLink.h
     DlgTipOfTheDayImp.h
+    DlgExpressionInput.h
     TaskDlgRelocation.h
     DlgUndoRedo.h
     InputVector.h
@@ -422,6 +427,7 @@ SET(Dialog_SRCS
     DlgPropertyLink.ui
     DlgTipOfTheDay.ui
     DlgTreeWidget.ui
+    DlgExpressionInput.ui
     DownloadManager.ui
     DownloadItem.ui
     MouseButtons.ui
@@ -880,6 +886,7 @@ SET(Widget_HPP_SRCS
     InputField.h
     ProgressBar.h
     QuantitySpinBox.h
+    QuantitySpinBox_p.h
     SpinBox.h
     Splashscreen.h
     WidgetFactory.h
@@ -952,6 +959,7 @@ SET(FreeCADGui_CPP_SRCS
     Document.cpp
     DocumentModel.cpp
     DocumentPyImp.cpp
+    ExpressionBinding.cpp
     GraphicsViewZoom.cpp
     ExpressionCompleter.cpp
     GuiApplicationNativeEventAware.cpp
@@ -972,6 +980,7 @@ SET(FreeCADGui_SRCS
     BitmapFactory.h
     Document.h
     DocumentModel.h
+    ExpressionBinding.cpp
     ExpressionCompleter.h
     FreeCADGuiInit.py
     GraphicsViewZoom.h
