@@ -236,6 +236,13 @@ public:
     /** This method returns a string representation of the property
      */
     const Base::Placement &getValue(void) const;
+
+    /// Set value of property
+    void setValue(const App::ObjectIdentifier & path, const boost::any & value);
+
+    /// Get value of property
+    const boost::any getValue(const App::ObjectIdentifier & path) const;
+
     const char* getEditorName(void) const {
         return "Gui::PropertyEditor::PropertyPlacementItem";
     }

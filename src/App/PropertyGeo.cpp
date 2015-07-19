@@ -34,12 +34,13 @@
 #include <Base/Reader.h>
 #include <Base/Stream.h>
 #include <Base/Rotation.h>
+#include <Base/Quantity.h>
 #include <Base/VectorPy.h>
 #include <Base/MatrixPy.h>
 #include <Base/PlacementPy.h>
 
+#include "ObjectIdentifier.h"
 #include "Placement.h"
-
 #include "PropertyGeo.h"
 
 using namespace App;
@@ -515,6 +516,135 @@ void PropertyPlacement::setValue(const Base::Placement &pos)
 const Base::Placement & PropertyPlacement::getValue(void)const
 {
     return _cPos;
+}
+
+void PropertyPlacement::setValue(const ObjectIdentifier &path, const boost::any &value)
+{
+    Base::Placement p = _cPos;
+    const std::string & c1 = path.getPropertyComponent(1).toString();
+
+    if (c1 == "Base") {
+        const std::string & c2 = path.getPropertyComponent(2).toString();
+        Base::Vector3d pos = p.getPosition();
+        double dvalue;
+
+        if (value.type() == typeid(double))
+            dvalue = boost::any_cast<double>(value);
+        else if (value.type() == typeid(Quantity)) {
+            Quantity qvalue(boost::any_cast<Quantity>(value));
+
+            if (qvalue.getUnit().isEmpty() || qvalue.getUnit() == Unit::Length)
+                dvalue = qvalue.getValue();
+            else
+                throw Base::Exception("Invalid unit for quantity");
+        }
+        else
+            throw Base::Exception("Invalid data type");
+
+        if (c2 == "x")
+            pos.x = dvalue;
+        else if (c2 == "y")
+            pos.y = dvalue;
+        else if (c2 == "z")
+            pos.z = dvalue;
+        else
+            throw Base::Exception("Invalid member (not x, y, nor z)");
+        p.setPosition(pos);
+    }
+    else if (c1 == "Rotation") {
+        const std::string & c2 = path.getPropertyComponent(2).toString();
+        Base::Rotation rot = _cPos.getRotation();
+        double quat[4];
+        memcpy(quat, rot.getValue(), 4 * sizeof(double));
+
+        if (c2 == "Angle") {
+            double dvalue;
+
+            if (value.type() == typeid(double))
+                dvalue = boost::any_cast<double>(value);
+            else if (value.type() == typeid(Quantity)) {
+                Quantity qvalue(boost::any_cast<Quantity>(value));
+
+                if (qvalue.getUnit().isEmpty() || qvalue.getUnit() == Unit::Angle)
+                    dvalue = qvalue.getValue();
+                else
+                    throw Base::Exception("Invalid unit for quantity");
+            }
+            else
+                throw Base::Exception("Invalid data type");
+
+            quat[3] = dvalue;
+        }
+        else if (c2 == "Axis") {
+            const std::string & c3 = path.getPropertyComponent(3).toString();
+            double dvalue;
+
+            if (value.type() == typeid(double))
+                dvalue = boost::any_cast<double>(value);
+            else if (value.type() == typeid(Quantity)) {
+                Quantity qvalue(boost::any_cast<Quantity>(value));
+
+                if (qvalue.getUnit().isEmpty() || qvalue.getUnit() == Unit::Length)
+                    dvalue = qvalue.getValue();
+                else
+                    throw Base::Exception("Invalid unit for quantity");
+            }
+            else
+                throw Base::Exception("Invalid data type");
+
+            if (c3 == "x")
+                quat[0] = dvalue;
+            else if (c3 == "y")
+                quat[1] = dvalue;
+            else if (c3 == "z")
+                quat[2] = dvalue;
+            else
+                throw Base::Exception("Invalid member (not x, y, nor z)");
+        }
+        else
+            throw Base::Exception("Invalid member (not Angle nor Axis)");
+
+        p.setRotation(Base::Rotation(quat));
+    }
+    else
+        throw Base::Exception("Invalid path (not Base nor Rotation)");
+
+    setValue(p);
+}
+
+const boost::any PropertyPlacement::getValue(const ObjectIdentifier &path) const
+{
+    if (path.getPropertyComponent(1).toString() == "Base") {
+        Base::Vector3d pos = _cPos.getPosition();
+
+        if (path.getPropertyComponent(2).toString() == "x")
+            return Quantity(pos.x, Unit::Length);
+        else if (path.getPropertyComponent(2).toString() == "y")
+            return Quantity(pos.y, Unit::Length);
+        else if (path.getPropertyComponent(2).toString() == "z")
+            return Quantity(pos.z, Unit::Length);
+        else
+            throw Base::Exception("Invalid member (not x, y, nor z)");
+    }
+    else if (path.getPropertyComponent(1).toString() == "Rotation") {
+        const double * quat = _cPos.getRotation().getValue();
+
+        if (path.getPropertyComponent(2).toString() == "Angle")
+            return Quantity(quat[3]);
+        else if (path.getPropertyComponent(2).toString() == "Axis") {
+            if (path.getPropertyComponent(3).toString() == "x")
+                return Quantity(quat[0], Unit::Length);
+            else if (path.getPropertyComponent(3).toString() == "y")
+                return Quantity(quat[1], Unit::Length);
+            else if (path.getPropertyComponent(3).toString() == "z")
+                return Quantity(quat[2], Unit::Length);
+            else
+                throw Base::Exception("Invalid member (not Angle nor Axis)");
+        }
+        else throw Base::Exception("Invalid member (not x, y, nor z)");
+    }
+    else
+        throw Base::Exception("Invalid path (not Base nor Rotation)");
 }
 
 PyObject *PropertyPlacement::getPyObject(void)
