@@ -33,6 +33,7 @@
 #include "DocumentObjectPy.h"
 #include "DocumentObjectGroup.h"
 #include "PropertyLinks.h"
+#include "PropertyExpressionEngine.h"
 
 using namespace App;
 
@@ -46,10 +47,11 @@ DocumentObjectExecReturn *DocumentObject::StdReturn = 0;
 //===========================================================================
 
 DocumentObject::DocumentObject(void)
-  : _pDoc(0),pcNameInDocument(0)
+    : ExpressionEngine(),_pDoc(0),pcNameInDocument(0)
 {
     // define Label of type 'Output' to avoid being marked as touched after relabeling
     ADD_PROPERTY_TYPE(Label,("Unnamed"),"Base",Prop_Output,"User name of the object (UTF8)");
+    ADD_PROPERTY_TYPE(ExpressionEngine,(),"Base",Prop_Hidden,"Property expressions");
 }
 
 DocumentObject::~DocumentObject(void)
@@ -88,7 +90,7 @@ App::DocumentObjectExecReturn *DocumentObject::recompute(void)
 
 DocumentObjectExecReturn *DocumentObject::execute(void)
 {
-    return DocumentObject::StdReturn;
+    return StdReturn;
 }
 
 short DocumentObject::mustExecute(void) const
@@ -148,6 +150,10 @@ std::vector<DocumentObject*> DocumentObject::getOutList(void) const
                 ret.push_back(static_cast<PropertyLinkSub*>(*It)->getValue());
         }
     }
+
+    // Get document objects that this document object relies on
+    ExpressionEngine.getDocumentObjectDeps(ret);
+
     return ret;
 }
 
@@ -217,8 +223,28 @@ void DocumentObject::touch(void)
     StatusBits.set(0);
 }
 
+bool DocumentObject::isTouched() const
+{
+    return ExpressionEngine.isTouched() || StatusBits.test(0);
+}
+
 void DocumentObject::Save (Base::Writer &writer) const
 {
     writer.ObjectName = this->getNameInDocument();
     App::PropertyContainer::Save(writer);
+}
+
+void DocumentObject::setExpression(const ObjectIdentifier &path, boost::shared_ptr<Expression> expr, const char * comment)
+{
+    ExpressionEngine.setValue(path, expr, comment);
+}
+
+const PropertyExpressionEngine::ExpressionInfo DocumentObject::getExpression(const ObjectIdentifier &path) const
+{
+    boost::any value = ExpressionEngine.getValue(path);
+
+    if (value.type() == typeid(PropertyExpressionEngine::ExpressionInfo))
+        return boost::any_cast<PropertyExpressionEngine::ExpressionInfo>(value);
+    else
+        return PropertyExpressionEngine::ExpressionInfo();
 }
