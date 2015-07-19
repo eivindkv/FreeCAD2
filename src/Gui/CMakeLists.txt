@@ -953,6 +953,7 @@ SET(FreeCADGui_CPP_SRCS
     DocumentModel.cpp
     DocumentPyImp.cpp
     GraphicsViewZoom.cpp
+    ExpressionCompleter.cpp
     GuiApplicationNativeEventAware.cpp
     GuiConsole.cpp
     Macro.cpp
@@ -971,6 +972,7 @@ SET(FreeCADGui_SRCS
     BitmapFactory.h
     Document.h
     DocumentModel.h
+    ExpressionCompleter.h
     FreeCADGuiInit.py
     GraphicsViewZoom.h
     GuiApplicationNativeEventAware.h
