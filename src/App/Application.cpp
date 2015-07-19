@@ -85,6 +85,7 @@
 #include "PropertyFile.h"
 #include "PropertyLinks.h"
 #include "PropertyPythonObject.h"
+#include "PropertyExpressionEngine.h"
 #include "Document.h"
 #include "DocumentObjectGroup.h"
 #include "DocumentObjectFileIncluded.h"
@@ -1086,6 +1087,8 @@ void Application::initTypes(void)
     App ::PropertyFile              ::init();
     App ::PropertyFileIncluded      ::init();
     App ::PropertyPythonObject      ::init();
+    App ::PropertyExpressionEngine  ::init();
+
     // Document classes
     App ::DocumentObject            ::init();
     App ::GeoFeature                ::init();
