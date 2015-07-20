@@ -46,6 +46,8 @@
 # include <vector>
 #endif  // #ifndef _PreComp_
 
+#include <boost/bind.hpp>
+
 #include <Base/Writer.h>
 #include <Base/Reader.h>
 #include <Base/Tools.h>
@@ -92,6 +94,11 @@ SketchObject::SketchObject()
     solverNeedsUpdate=false;
     
     noRecomputes=false;
+
+    ExpressionEngine.setValidator(boost::bind(&Sketcher::SketchObject::validateExpression, this, _1, _2));
+
+    constraintsRemovedConn = Constraints.signalConstraintsRemoved.connect(boost::bind(&Sketcher::SketchObject::constraintsRemoved, this, _1));
+    constraintsRenamedConn = Constraints.signalConstraintsRenamed.connect(boost::bind(&Sketcher::SketchObject::constraintsRenamed, this, _1));
 }
 
 SketchObject::~SketchObject()
@@ -2541,6 +2548,38 @@ void SketchObject::validateConstraints()
     }
 }
 
+std::string SketchObject::validateExpression(const App::ObjectIdentifier &path, boost::shared_ptr<const App::Expression> expr)
+{
+    const App::Property * prop = path.getProperty();
+
+    assert(expr != 0);
+
+    if (!prop)
+        return "Property not found";
+
+    if (prop == &Constraints) {
+        const Constraint * constraint = Constraints.getConstraint(path);
+
+        if (!constraint->isDriving)
+            return "Reference constraints cannot be set!";
+    }
+
+    std::set<App::ObjectIdentifier> deps;
+    expr->getDeps(deps);
+
+    for (std::set<App::ObjectIdentifier>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
+        const App::Property * prop = (*i).getProperty();
+
+        if (prop == &Constraints) {
+            const Constraint * constraint = Constraints.getConstraint(*i);
+
+            if (!constraint->isDriving)
+                return "Reference constraint from this sketch cannot be used in this expression.";
+        }
+    }
+    return "";
+}
+
 //This function is necessary for precalculation of an angle when adding
 // an angle constraint. It is also used here, in SketchObject, to
 // lock down the type of tangency/perpendicularity.
@@ -2586,6 +2625,21 @@ double SketchObject::calculateAngleViaPoint(int GeoId1, int GeoId2, double px, d
     double ang = atan2(-tan2.X()*tan1.Y()+tan2.Y()*tan1.X(), tan2.X()*tan1.X() + tan2.Y()*tan1.Y());
     return ang;
 */
+}
+
+void SketchObject::constraintsRenamed(const std::map<App::ObjectIdentifier, App::ObjectIdentifier> &renamed)
+{
+    ExpressionEngine.renameExpressions(renamed);
+}
+
+void SketchObject::constraintsRemoved(const std::set<App::ObjectIdentifier> &removed)
+{
+    std::set<App::ObjectIdentifier>::const_iterator i = removed.begin();
+
+    while (i != removed.end()) {
+        ExpressionEngine.setValue(*i, boost::shared_ptr<App::Expression>(), 0);
+        ++i;
+    }
 }
 
 //Tests if the provided point lies exactly in a curve (satisfies

@@ -4093,7 +4093,10 @@ void ViewProviderSketch::updateData(const App::Property *prop)
         if(getSketchObject()->getExternalGeometryCount()+getSketchObject()->getHighestCurveIndex() + 1 == 
             getSketchObject()->getSolvedSketch().getGeometrySize()) {
             UpdateSolverInformation(); // just update the solver window with the last SketchObject solving information
-            draw(false);
+
+            Gui::MDIView *mdi = Gui::Application::Instance->activeDocument()->getActiveView();
+            if (mdi->isDerivedFrom(Gui::View3DInventor::getClassTypeId()))
+                draw(false);
             
             signalConstraintsChanged();
             signalElementsChanged();

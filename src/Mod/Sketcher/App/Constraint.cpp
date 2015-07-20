@@ -27,7 +27,7 @@
 
 #include <Base/Writer.h>
 #include <Base/Reader.h>
-
+#include <QDateTime>
 
 #include "Constraint.h"
 #include "ConstraintPy.h"
@@ -56,6 +56,17 @@ Constraint::Constraint()
   LabelPosition(0.f),
   isDriving(true)
 {
+    // Initialize a random number generator, to avoid Valgrind false positives.
+    static boost::mt19937 ran;
+    static bool seeded = false;
+
+    if (!seeded) {
+        ran.seed(QDateTime::currentMSecsSinceEpoch() & 0xffffffff);
+        seeded = true;
+    }
+    static boost::uuids::basic_random_generator<boost::mt19937> gen(&ran);
+
+    tag = gen();
 }
 
 Constraint::Constraint(const Constraint& from)
@@ -71,7 +82,8 @@ Constraint::Constraint(const Constraint& from)
   ThirdPos(from.ThirdPos),
   LabelDistance(from.LabelDistance),
   LabelPosition(from.LabelPosition),
-  isDriving(from.isDriving)
+  isDriving(from.isDriving),
+  tag(from.tag)
 {
 }
 

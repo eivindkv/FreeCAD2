@@ -134,6 +134,8 @@ void EditDatumDialog::exec(bool atCursor)
 
         ui_ins_datum.labelEdit->setValue(init_val);
         ui_ins_datum.labelEdit->selectNumber();
+        ui_ins_datum.labelEdit->bind(App::ObjectIdentifier(sketch) << App::ObjectIdentifier::Component::ArrayComponent("Constraints", ConstrNbr));
+        ui_ins_datum.name->setText(QString::fromStdString(Constr->Name));
 
         if (atCursor)
             dlg.setGeometry(QCursor::pos().x() - dlg.geometry().width() / 2, QCursor::pos().y(), dlg.geometry().width(), dlg.geometry().height());
@@ -157,9 +159,20 @@ void EditDatumDialog::exec(bool atCursor)
 
                 try {
                     Gui::Command::openCommand("Modify sketch constraints");
-                    Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.setDatum(%i,App.Units.Quantity('%f %s'))",
-                                sketch->getNameInDocument(),
-                                ConstrNbr, newDatum, (const char*)newQuant.getUnit().getString().toUtf8());
+                    if (ui_ins_datum.labelEdit->hasExpression())
+                        ui_ins_datum.labelEdit->apply();
+                    else
+                        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.setDatum(%i,App.Units.Quantity('%f %s'))",
+                                                sketch->getNameInDocument(),
+                                                ConstrNbr, newDatum, (const char*)newQuant.getUnit().getString().toUtf8());
+                    QString constraintName = ui_ins_datum.name->text().trimmed();
+                    if (constraintName.size() > 0 || sketch->Constraints[ConstrNbr]->Name.size() > 0) {
+                        std::string escapedstr = Base::Tools::escapedUnicodeFromUtf8(constraintName.toStdString().c_str());
+                        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.renameConstraint(%d, '%s')",
+                                                sketch->getNameInDocument(),
+                                                ConstrNbr, escapedstr.c_str());
+                    }
+
                     Gui::Command::commitCommand();
                     
                     ParameterGrp::handle hGrp = App::GetApplication().GetParameterGroupByPath("User parameter:BaseApp/Preferences/Mod/Sketcher");

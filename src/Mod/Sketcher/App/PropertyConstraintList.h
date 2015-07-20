@@ -32,6 +32,8 @@
 #include <App/Property.h>
 #include <Mod/Part/App/Geometry.h>
 #include "Constraint.h"
+#include <boost/signals.hpp>
+#include <boost/unordered/unordered_map.hpp>
 
 namespace Base {
 class Writer;
@@ -99,8 +101,24 @@ public:
     bool scanGeometry(const std::vector<Part::Geometry *> &GeoList) const;
     bool isGeometryInvalid(){return invalidGeometry;}
 
+    const Constraint *getConstraint(const App::ObjectIdentifier &path) const;
+    virtual void setValue(const App::ObjectIdentifier & path, const boost::any & value);
+    virtual const boost::any getValue(const App::ObjectIdentifier & path) const;
+    virtual const App::ObjectIdentifier canonicalPath(const App::ObjectIdentifier & p) const;
+    virtual void getPaths(std::vector<App::ObjectIdentifier> & paths) const;
+
+    typedef std::pair<int, const Constraint*> ConstraintInfo ;
+
+    boost::signal<void (const std::map<App::ObjectIdentifier, App::ObjectIdentifier> &)> signalConstraintsRenamed;
+    boost::signal<void (const std::set<App::ObjectIdentifier> &)> signalConstraintsRemoved;
+
 private:
+    App::ObjectIdentifier makeArrayPath(int idx);
+    App::ObjectIdentifier makeSimplePath(const Constraint *c);
+    App::ObjectIdentifier makePath(int idx, const Constraint *c);
+
     std::vector<Constraint *> _lValueList;
+    boost::unordered_map<boost::uuids::uuid, int> valueMap;
 
     std::vector<unsigned int> validGeometryKeys;
     bool invalidGeometry;

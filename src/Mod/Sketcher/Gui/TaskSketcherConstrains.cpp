@@ -362,12 +362,11 @@ void TaskSketcherConstrains::on_listWidgetConstraints_itemChanged(QListWidgetIte
     if (!item || inEditMode)
         return;
     ConstraintItem *it = dynamic_cast<ConstraintItem*>(item);
-    const std::vector< Sketcher::Constraint * > &vals = sketchView->getSketchObject()->Constraints.getValues();
-    Sketcher::Constraint* v = vals[it->ConstraintNbr];
+    Sketcher::SketchObject * sketch = sketchView->getSketchObject();
+    const std::vector< Sketcher::Constraint * > &vals = sketch->Constraints.getValues();
+    const Sketcher::Constraint* v = vals[it->ConstraintNbr];
 
     QString name = it->data(Qt::EditRole).toString();
-    if (name.isEmpty())
-        name = QString::fromLatin1("Constraint%1").arg(it->ConstraintNbr+1);
 
     QString unitStr;
     switch(v->Type) {
@@ -396,7 +395,21 @@ void TaskSketcherConstrains::on_listWidgetConstraints_itemChanged(QListWidgetIte
         break;
     }
 
-    v->Name = (const char*)name.toUtf8();
+    std::string constraintName = name.toStdString();
+
+    if (constraintName != v->Name) {
+        std::string escapedstr = Base::Tools::escapedUnicodeFromUtf8(constraintName.c_str());
+
+        Gui::Command::openCommand("Rename sketch constraint");
+        Gui::Command::doCommand(Gui::Command::Doc,"App.ActiveDocument.%s.renameConstraint(%d, '%s')",
+                                sketch->getNameInDocument(),
+                                it->ConstraintNbr, escapedstr.c_str());
+        Gui::Command::commitCommand();
+    }
+
+    if (name.isEmpty())
+        name = QString::fromLatin1("Constraint%1").arg(it->ConstraintNbr+1);
+
     if (!unitStr.isEmpty()) {
         inEditMode = true;
         item->setData(Qt::UserRole, QString::fromLatin1("%1 (%2)")
