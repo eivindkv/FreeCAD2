@@ -447,8 +447,8 @@ TYPESYSTEM_SOURCE(Spreadsheet::OperatorExpression, Spreadsheet::Expression);
 
 OperatorExpression::OperatorExpression(const App::DocumentObject *_owner, Expression * _left, Operator _op, Expression * _right)
     : UnitExpression(_owner)
-    , left(_left)
     , op(_op)
+    , left(_left)
     , right(_right)
 {
 
@@ -591,6 +591,8 @@ std::string OperatorExpression::toString() const
         break;
     case POS:
         s << "+";
+        break;
+    default:
         break;
     }
 
@@ -804,9 +806,9 @@ Expression * FunctionExpression::eval() const
             if (!p)
                 continue;
 
-            if (qp = freecad_dynamic_cast<App::PropertyQuantity>(p))
+            if ((qp = freecad_dynamic_cast<App::PropertyQuantity>(p)) != 0)
                 value = qp->getQuantityValue();
-            else if (fp = freecad_dynamic_cast<App::PropertyFloat>(p))
+            else if ((fp = freecad_dynamic_cast<App::PropertyFloat>(p)) != 0)
                 value = fp->getValue();
             else
                 throw Exception("Invalid property type for aggregate");
@@ -842,6 +844,8 @@ Expression * FunctionExpression::eval() const
                 if (first || value > q)
                     q = value;
                 break;
+            default:
+                break;
             }
 
             first = false;
@@ -856,6 +860,8 @@ Expression * FunctionExpression::eval() const
                 q = Quantity();
             else
                 q = (M2 / (n - 1.0)).pow(Quantity(0.5));
+            break;
+        default:
             break;
         }
 
@@ -1052,7 +1058,7 @@ Expression *FunctionExpression::simplify() const
         switch (f) {
         case ATAN2:
         case MOD:
-        case POW:
+        case POW: {
             Expression * v2 = args[1]->simplify();
 
             if (freecad_dynamic_cast<NumberExpression>(v2)) {
@@ -1066,6 +1072,9 @@ Expression *FunctionExpression::simplify() const
                 a.push_back(v2);
                 return new FunctionExpression(owner, f, a);
             }
+        }
+        default:
+            break;
         }
         delete v1;
         return eval();

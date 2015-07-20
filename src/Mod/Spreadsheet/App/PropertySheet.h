@@ -165,14 +165,14 @@ private:
 
     friend class Cell;
 
+    Sheet * owner;
+
     std::map<CellAddress, Cell*> data;
 
     std::set<CellAddress> dirty;
 
     /* Merged cells; cell -> anchor cell */
     std::map<CellAddress, CellAddress> mergedCells;
-
-    Sheet * owner;
 
     /*
      * Cell dependency tracking

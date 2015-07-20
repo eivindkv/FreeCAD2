@@ -861,7 +861,6 @@ bool PropertySheet::isHidden(CellAddress address) const
 void PropertySheet::addDependencies(CellAddress key)
 {
     Cell * cell = getValue(key);
-    bool hasUnresolvedDeps = false;
 
     if (!cell)
         return;
