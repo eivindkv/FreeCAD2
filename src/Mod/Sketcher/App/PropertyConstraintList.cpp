@@ -408,6 +408,18 @@ int PropertyConstraintList::getIndexFromConstraintName(const string &name)
     return std::atoi(name.substr(10,4000).c_str()) - 1;
 }
 
+/**
+ * @brief keepSign Return value with same sign as adoptSignFrom.
+ * @param value Value to convert
+ * @param adoptSignFrom Value to use as template
+ * @return Value with same sign as adoptSignFrom.
+ */
+
+static inline double keepSign(double value, double adoptSignFrom)
+{
+    return std::fabs(value) * (adoptSignFrom < 0 ? -1 : 1);
+}
+
 void PropertyConstraintList::setPathValue(const ObjectIdentifier &path, const boost::any &value)
 {
     const ObjectIdentifier::Component & c0 = path.getPropertyComponent(0);
@@ -424,7 +436,7 @@ void PropertyConstraintList::setPathValue(const ObjectIdentifier &path, const bo
         if (c0.getIndex() >= _lValueList.size())
             throw Base::Exception("Array out of bounds");
         aboutToSetValue();
-        _lValueList[c0.getIndex()]->setValue(dvalue);
+        _lValueList[c0.getIndex()]->setValue(keepSign(dvalue, _lValueList[c0.getIndex()]->getValue()));
         hasSetValue();
         return;
     }
@@ -434,7 +446,7 @@ void PropertyConstraintList::setPathValue(const ObjectIdentifier &path, const bo
         for (std::vector<Constraint *>::const_iterator it = _lValueList.begin(); it != _lValueList.end(); ++it) {
             if ((*it)->Name == c1.getName()) {
                 aboutToSetValue();
-                _lValueList[it - _lValueList.begin()]->setValue(dvalue);
+                _lValueList[it - _lValueList.begin()]->setValue(keepSign(dvalue, _lValueList[it - _lValueList.begin()]->getValue()));
                 hasSetValue();
                 return;
             }
