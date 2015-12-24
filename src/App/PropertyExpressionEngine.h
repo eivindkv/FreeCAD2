@@ -39,6 +39,24 @@ class XMLReader;
 
 namespace App {
 
+template<class P> class Signaller {
+public:
+    Signaller(P & prop) : mProp(prop) {
+        if (mProp.signalCounter == 0)
+            mProp.aboutToSetValue();
+        mProp.signalCounter++;
+    }
+
+    ~Signaller() {
+        mProp.signalCounter--;
+        if (mProp.signalCounter == 0)
+               mProp.hasSetValue();
+    }
+
+private:
+    P & mProp;
+};
+
 class DocumentObject;
 class DocumentObjectExecReturn;
 class ObjectIdentifier;
@@ -124,9 +142,13 @@ public:
     ///signal called when a expression was changed 
     boost::signal<void (const App::ObjectIdentifier &)> expressionChanged; 
 
+    void onDocumentRestored();
+
     /* Python interface */
     PyObject *getPyObject(void);
     void setPyObject(PyObject *);
+
+    friend class Signaller<PropertyExpressionEngine>;
 
 private:
 
@@ -143,11 +165,15 @@ private:
     void buildGraph(const ExpressionMap &exprs,
                     boost::unordered_map<int, App::ObjectIdentifier> &revNodes, DiGraph &g) const;
 
+    int signalCounter; /**< Counter for invoking transaction start/stop */
+
     bool running; /**< Boolean used to avoid loops */
 
     ExpressionMap expressions; /**< Stored expressions */
 
     ValidatorFunc validator; /**< Valdiator functor */
+
+    ExpressionMap restoredExpressions; /**< Expressions are read from file to this map first before they are validated and inserted into the actual map */
 
 };
 
