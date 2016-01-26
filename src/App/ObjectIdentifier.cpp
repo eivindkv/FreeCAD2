@@ -122,11 +122,15 @@ ObjectIdentifier::ObjectIdentifier(const App::PropertyContainer * _owner, const 
         if (!docObj)
             throw Base::Exception("Property must be owned by a document object.");
 
-        const Document * doc = docObj->getDocument();
+        if (property.size() > 0) {
+            const Document * doc = docObj->getDocument();
 
-        documentName = String(doc->getName(), false, true);
-        documentObjectName = String(docObj->getNameInDocument(), false, true);
+            documentName = String(doc->getName(), false, true);
+            documentObjectName = String(docObj->getNameInDocument(), false, true);
 
+            documentNameSet = true;
+            documentObjectNameSet = true;
+        }
     }
     if (property.size() > 0)
         addComponent(Component::SimpleComponent(property));
@@ -139,8 +143,8 @@ ObjectIdentifier::ObjectIdentifier(const App::PropertyContainer * _owner, const 
 
 ObjectIdentifier::ObjectIdentifier(const Property &prop)
     : owner(prop.getContainer())
-    , documentNameSet(false)
-    , documentObjectNameSet(false)
+    , documentNameSet(true)
+    , documentObjectNameSet(true)
     , propertyIndex(-1)
 {
     DocumentObject * docObj = freecad_dynamic_cast<DocumentObject>(prop.getContainer());
