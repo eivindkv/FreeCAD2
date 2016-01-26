@@ -234,14 +234,16 @@ protected:
     App::DocumentObject *getDocumentObject(const App::Document *doc, const String &name, bool &byIdentifier) const;
 
     const App::PropertyContainer * owner;
+    String  documentName;
     bool documentNameSet;
+    String  documentObjectName;
     bool documentObjectNameSet;
     std::vector<Component> components;
 
     /// Mutable elements, updated by resolve()
     mutable int propertyIndex;
-    mutable String documentName;
-    mutable String documentObjectName;
+    mutable String resolvedDocumentName;
+    mutable String resolvedDocumentObjectName;
     mutable std::string propertyName;
 
 };

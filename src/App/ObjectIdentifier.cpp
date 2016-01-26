@@ -122,11 +122,12 @@ ObjectIdentifier::ObjectIdentifier(const App::PropertyContainer * _owner, const 
         if (!docObj)
             throw Base::Exception("Property must be owned by a document object.");
 
-        const Document * doc = docObj->getDocument();
+        if (property.size() > 0) {
+            const Document * doc = docObj->getDocument();
 
-        documentName = String(doc->getName(), false, true);
-        documentObjectName = String(docObj->getNameInDocument(), false, true);
-
+            documentName = String(doc->getName(), false, true);
+            documentObjectName = String(docObj->getNameInDocument(), false, true);
+        }
     }
     if (property.size() > 0)
         addComponent(Component::SimpleComponent(property));
@@ -198,9 +199,9 @@ bool ObjectIdentifier::operator ==(const ObjectIdentifier &other) const
 
     if (owner != other.owner)
         return false;
-    if (documentName != other.documentName)
+    if (resolvedDocumentName != other.resolvedDocumentName)
         return false;
-    if (documentObjectName != other.documentObjectName)
+    if (resolvedDocumentObjectName != other.resolvedDocumentObjectName)
         return false;
     if (components != other.components)
         return false;
@@ -229,16 +230,16 @@ bool ObjectIdentifier::operator <(const ObjectIdentifier &other) const
     resolve();
     other.resolve();
 
-    if (documentName < other.documentName)
+    if (resolvedDocumentName < other.resolvedDocumentName)
         return true;
 
-    if (documentName > other.documentName)
+    if (resolvedDocumentName > other.resolvedDocumentName)
         return false;
 
-    if (documentObjectName < other.documentObjectName)
+    if (resolvedDocumentObjectName < other.resolvedDocumentObjectName)
         return true;
 
-    if (documentObjectName > other.documentObjectName)
+    if (resolvedDocumentObjectName > other.resolvedDocumentObjectName)
         return false;
 
     if (components.size() < other.components.size())
@@ -342,16 +343,16 @@ bool ObjectIdentifier::renameDocumentObject(const std::string &oldName, const st
     if (oldName == newName)
         return false;
 
-    if (documentObjectNameSet && documentObjectName == oldName) {
+    if (documentObjectNameSet && resolvedDocumentObjectName == oldName) {
         if (ExpressionParser::isTokenAnIndentifier(newName))
-            documentObjectName = newName;
+            resolvedDocumentObjectName = newName;
         else
-            documentObjectName = ObjectIdentifier::String(newName, true);
+            resolvedDocumentObjectName = ObjectIdentifier::String(newName, true);
 
         resolve();
         return true;
     }
-    else if (propertyIndex == 1 && documentObjectName == oldName) {
+    else if (propertyIndex == 1 && resolvedDocumentObjectName == oldName) {
         if (ExpressionParser::isTokenAnIndentifier(newName))
             components[0].name = newName;
         else
@@ -374,8 +375,8 @@ bool ObjectIdentifier::renameDocument(const std::string &oldName, const std::str
     if (oldName == newName)
         return false;
 
-    if (documentName == oldName) {
-        documentName = newName;
+    if (resolvedDocumentName == oldName) {
+        resolvedDocumentName = newName;
         resolve();
         return true;
     }
@@ -598,18 +599,19 @@ void ObjectIdentifier::resolve() const
     if (doc == 0) {
         doc = freecad_dynamic_cast<DocumentObject>(owner)->getDocument();
         if (doc == 0) {
-            documentName = String();
-            documentObjectName = String();
+            resolvedDocumentName = String();
+            resolvedDocumentObjectName = String();
             return;
         }
     }
 
-    documentName = String(doc->getName(), false, documentName.isForceIdentifier());
+    resolvedDocumentName = String(doc->getName(), false, true);
 
     /* Document object name specified? */
-    if (documentObjectNameSet) {
+    if (documentObjectName.getString().size() > 0) {
         bool dummy;
 
+        resolvedDocumentObjectName = documentObjectName;
         docObject = getDocumentObject(doc, documentObjectName, dummy);
         if (!docObject)
             return;
@@ -623,7 +625,7 @@ void ObjectIdentifier::resolve() const
     else {
         /* Document object name not specified, resolve from path */
         if (components.size() == 1) {
-            documentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, documentObjectName.isForceIdentifier());
+            resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
             propertyName = components[0].name.getString();
             propertyIndex = 0;
         }
@@ -636,12 +638,12 @@ void ObjectIdentifier::resolve() const
             docObject = getDocumentObject(doc, components[0].name, byIdentifier);
 
             if (docObject) {
-                documentObjectName = String(components[0].name, false, byIdentifier);
+                resolvedDocumentObjectName = String(components[0].name, false, byIdentifier);
                 propertyName = components[1].name.getString();
                 propertyIndex = 1;
             }
             else {
-                documentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
+                resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
                 propertyName = components[0].name.getString();
                 propertyIndex = 0;
             }
@@ -705,7 +707,7 @@ DocumentObject *ObjectIdentifier::getDocumentObject() const
     if (!doc)
         return 0;
 
-    return  getDocumentObject(doc, documentObjectName, dummy);
+    return  getDocumentObject(doc, resolvedDocumentObjectName, dummy);
 }
 
 /**
@@ -718,9 +720,9 @@ std::vector<std::string> ObjectIdentifier::getStringList() const
     std::vector<std::string> l;
 
     if (documentNameSet)
-        l.push_back(documentName.toString());
+        l.push_back(resolvedDocumentName.toString());
     if (documentObjectNameSet)
-        l.push_back(documentObjectName.toString());
+        l.push_back(resolvedDocumentObjectName.toString());
 
     std::vector<Component>::const_iterator i = components.begin();
     while (i != components.end()) {
@@ -798,7 +800,7 @@ Property *ObjectIdentifier::getProperty() const
     if (!doc)
         return 0;
 
-    App::DocumentObject * docObj = getDocumentObject(doc, documentObjectName, dummy);
+    App::DocumentObject * docObj = getDocumentObject(doc, resolvedDocumentObjectName, dummy);
 
     if (!docObj)
         return 0;
@@ -854,7 +856,7 @@ void ObjectIdentifier::setDocumentName(const ObjectIdentifier::String &name, boo
 const ObjectIdentifier::String ObjectIdentifier::getDocumentName() const
 {
     resolve();
-    return documentName;
+    return resolvedDocumentName;
 }
 
 /**
@@ -881,7 +883,7 @@ void ObjectIdentifier::setDocumentObjectName(const ObjectIdentifier::String &nam
 const ObjectIdentifier::String ObjectIdentifier::getDocumentObjectName() const
 {
     resolve();
-    return documentObjectName;
+    return resolvedDocumentObjectName;
 }
 
 /**
