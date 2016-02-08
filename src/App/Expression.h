@@ -368,7 +368,11 @@ public:
 
     void setPath(const ObjectIdentifier & path);
 
+    bool validDocumentObjectRename(const std::string & oldName, const std::string & newName);
+
     bool renameDocumentObject(const std::string & oldName, const std::string & newName);
+
+    bool validDocumentRename(const std::string &oldName, const std::string &newName);
 
     bool renameDocument(const std::string &oldName, const std::string &newName);
 
