@@ -46,7 +46,7 @@ public:
     virtual void visit(Expression * e) = 0;
 };
 
-template<class P> class AppExport ExpressionModifier : public ExpressionVisitor {
+template<class P> class ExpressionModifier : public ExpressionVisitor {
 public:
     ExpressionModifier(P & _prop)
         : prop(_prop) { }

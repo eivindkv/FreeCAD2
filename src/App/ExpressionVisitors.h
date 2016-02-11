@@ -33,7 +33,7 @@ namespace App {
  * possibly rename VariableExpression nodes.
  */
 
-template<class P> class AppExport RenameObjectIdentifierExpressionVisitor : public ExpressionModifier<P> {
+template<class P> class RenameObjectIdentifierExpressionVisitor : public ExpressionModifier<P> {
 public:
     RenameObjectIdentifierExpressionVisitor(P & _prop,
                                             const std::map<ObjectIdentifier, ObjectIdentifier> &_paths, const ObjectIdentifier & _owner)
