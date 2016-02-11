@@ -47,6 +47,7 @@ class GuiExport QuantitySpinBox : public QAbstractSpinBox, public ExpressionBind
 
 public:
     using ExpressionBinding::apply;
+    using ExpressionBinding::bind;
 
     explicit QuantitySpinBox(QWidget *parent = 0);
     virtual ~QuantitySpinBox();

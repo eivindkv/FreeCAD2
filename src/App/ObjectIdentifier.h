@@ -152,9 +152,9 @@ public:
 
     };
 
-    ObjectIdentifier(const App::PropertyContainer * _owner = 0, const std::string & property = std::string());
+    explicit ObjectIdentifier(const App::PropertyContainer * _owner = 0, const std::string & property = std::string());
 
-    ObjectIdentifier(const App::Property & prop);
+    explicit ObjectIdentifier(const App::Property & prop);
 
     // Components
     void addComponent(const Component &c) { components.push_back(c); }

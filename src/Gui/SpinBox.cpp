@@ -315,11 +315,6 @@ bool UIntSpinBox::apply(const std::string & propName)
         return false;
 }
 
-bool UIntSpinBox::apply()
-{
-    return ExpressionBinding::apply();
-}
-
 void UIntSpinBox::resizeEvent(QResizeEvent * event)
 {
     QAbstractSpinBox::resizeEvent(event);

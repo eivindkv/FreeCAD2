@@ -73,6 +73,9 @@ class GuiExport UIntSpinBox : public QSpinBox, public ExpressionBinding
     Q_OVERRIDE( uint value READ value WRITE setValue )
 
 public:
+    using ExpressionBinding::apply;
+    using ExpressionBinding::bind;
+
     UIntSpinBox ( QWidget* parent=0 );
     virtual ~UIntSpinBox();
 
@@ -87,7 +90,6 @@ public:
     void setExpression(boost::shared_ptr<App::Expression> expr);
     void bind(const App::ObjectIdentifier &_path);
     bool apply(const std::string &propName);
-    bool apply();
 
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *event);
