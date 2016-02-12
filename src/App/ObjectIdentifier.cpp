@@ -650,6 +650,9 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
 
     // Assume document name and object name from owner if not found
     if (results.resolvedDocument == 0) {
+        if (documentName.getString().size() > 0)
+            return;
+
         results.resolvedDocument = freecad_dynamic_cast<DocumentObject>(owner)->getDocument();
         if (results.resolvedDocument == 0)
             return;
