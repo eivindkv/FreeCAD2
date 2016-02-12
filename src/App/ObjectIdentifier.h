@@ -240,6 +240,7 @@ protected:
         String resolvedDocumentName;
         App::DocumentObject * resolvedDocumentObject;
         String resolvedDocumentObjectName;
+        App::Property * resolvedProperty;
         std::string propertyName;
     };
 

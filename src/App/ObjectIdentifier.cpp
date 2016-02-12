@@ -677,6 +677,7 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
         if (components.size() > 0) {
             results.propertyName = components[0].name.getString();
             results.propertyIndex = 0;
+            results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
         }
         else
             return;
@@ -692,6 +693,8 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
             results.resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
             results.resolvedDocumentObject = getDocumentObject(results.resolvedDocument, results.resolvedDocumentObjectName, byIdentifier);
             results.propertyName = components[0].name.getString();
+            if (results.resolvedDocumentObject)
+                results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
             results.propertyIndex = 0;
         }
         else if (components.size() >= 2) {
@@ -708,12 +711,15 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
                 /* Yes */
                 results.resolvedDocumentObjectName = String(components[0].name, false, byIdentifier);
                 results.propertyName = components[1].name.getString();
+                results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
                 results.propertyIndex = 1;
             }
             else {
                 /* No, assume component is a property, and get document object's name from owner */
                 results.resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
                 results.propertyName = components[0].name.getString();
+                if (results.resolvedDocumentObject)
+                    results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
                 results.propertyIndex = 0;
             }
         }
@@ -868,20 +874,9 @@ ObjectIdentifier &ObjectIdentifier::operator <<(const ObjectIdentifier::Componen
 
 Property *ObjectIdentifier::getProperty() const
 {
-    const App::Document * doc = getDocument();
-    bool dummy;
-
-    if (!doc)
-        return 0;
-
     ResolveResults result(*this);
 
-    App::DocumentObject * docObj = getDocumentObject(doc, result.resolvedDocumentObjectName, dummy);
-
-    if (!docObj)
-        return 0;
-
-    return docObj->getPropertyByName(getPropertyComponent(0).getName().c_str());
+    return result.resolvedProperty;
 }
 
 /**
@@ -1101,6 +1096,7 @@ ObjectIdentifier::ResolveResults::ResolveResults(const ObjectIdentifier &oi)
     , resolvedDocumentName()
     , resolvedDocumentObject(0)
     , resolvedDocumentObjectName()
+    , resolvedProperty(0)
     , propertyName()
 {
     oi.resolve(*this);
