@@ -632,15 +632,8 @@ App::DocumentObject * ObjectIdentifier::getDocumentObject(const App::Document * 
 
 void ObjectIdentifier::resolve(ResolveResults &results) const
 {
-    if (freecad_dynamic_cast<DocumentObject>(owner) == 0) {
-        results.resolvedDocumentName = String();
-        results.resolvedDocument = 0;
-        results.resolvedDocumentObjectName = String();
-        results.resolvedDocumentObject = 0;
-        results.propertyName = "";
-        results.propertyIndex = 0;
+    if (freecad_dynamic_cast<DocumentObject>(owner) == 0)
         return;
-    }
 
     /* Document name specified? */
     if (documentName.getString().size() > 0) {
@@ -655,13 +648,8 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
     // Assume document name and object name from owner if not found
     if (results.resolvedDocument == 0) {
         results.resolvedDocument = freecad_dynamic_cast<DocumentObject>(owner)->getDocument();
-        if (results.resolvedDocument == 0) {
-            results.resolvedDocumentName = String();
-            results.resolvedDocument = 0;
-            results.resolvedDocumentObjectName = String();
-            results.resolvedDocumentObject = 0;
+        if (results.resolvedDocument == 0)
             return;
-        }
     }
 
     results.resolvedDocumentName = String(results.resolvedDocument->getName(), false, true);
