@@ -638,9 +638,12 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
     /* Document name specified? */
     if (documentName.getString().size() > 0) {
         results.resolvedDocument = getDocument(documentName);
+        results.resolvedDocumentName = documentName;
     }
-    else
+    else {
         results.resolvedDocument = freecad_dynamic_cast<DocumentObject>(owner)->getDocument();
+        results.resolvedDocumentName = String(results.resolvedDocument->getName(), false, true);
+    }
 
     results.propertyName = "";
     results.propertyIndex = 0;
