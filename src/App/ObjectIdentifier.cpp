@@ -717,6 +717,7 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
             else {
                 /* No, assume component is a property, and get document object's name from owner */
                 results.resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
+                results.resolvedDocumentObject = results.resolvedDocument->getObject(static_cast<const DocumentObject*>(owner)->getNameInDocument());
                 results.propertyName = components[0].name.getString();
                 if (results.resolvedDocumentObject)
                     results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
