@@ -709,13 +709,26 @@ void ObjectIdentifier::resolve(ResolveResults &results) const
                 results.propertyIndex = 1;
             }
             else {
-                /* No, assume component is a property, and get document object's name from owner */
-                results.resolvedDocumentObjectName = String(static_cast<const DocumentObject*>(owner)->getNameInDocument(), false, true);
-                results.resolvedDocumentObject = results.resolvedDocument->getObject(static_cast<const DocumentObject*>(owner)->getNameInDocument());
-                results.propertyName = components[0].name.getString();
+
+                /* Document name set explicitely? */
+                if (documentName.getString().size() > 0) {
+                    /* Yes; then document object must follow */
+                    results.resolvedDocumentObjectName = String(components[0].name, false, byIdentifier);
+                    results.resolvedDocumentObject = results.resolvedDocument->getObject(static_cast<const DocumentObject*>(owner)->getNameInDocument());
+                    results.propertyIndex = 1;
+                }
+                else {
+                    /* No, assume component is a property, and get document object's name from owner */
+                    const DocumentObject * docObj = static_cast<const DocumentObject*>(owner);
+                    results.resolvedDocument = docObj->getDocument();
+                    results.resolvedDocumentName = String(results.resolvedDocument->getName(), false, true);
+                    results.resolvedDocumentObjectName = String(docObj->getNameInDocument(), false, true);
+                    results.resolvedDocumentObject = docObj->getDocument()->getObject(docObj->getNameInDocument());
+                    results.propertyIndex = 0;
+                }
+                results.propertyName = components[results.propertyIndex].name.getString();
                 if (results.resolvedDocumentObject)
                     results.resolvedProperty = results.resolvedDocumentObject->getPropertyByName(results.propertyName.c_str());
-                results.propertyIndex = 0;
             }
         }
         else
