@@ -1124,7 +1124,8 @@ void PropertySheet::renamedDocument(const App::Document * doc)
 
 void PropertySheet::renameObjectIdentifiers(const std::map<App::ObjectIdentifier, App::ObjectIdentifier> &paths)
 {
-    RenameObjectIdentifierExpressionVisitor<PropertySheet> v(*this, paths, App::ObjectIdentifier(*this));
+    App::ObjectIdentifier oi(*this);
+    RenameObjectIdentifierExpressionVisitor<PropertySheet> v(*this, paths, oi);
 
     for (std::map<CellAddress, Cell*>::iterator it = data.begin(); it != data.end(); ++it)
         it->second->visit(v);
