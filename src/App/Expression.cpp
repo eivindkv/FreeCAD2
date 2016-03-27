@@ -1247,7 +1247,7 @@ Expression *FunctionExpression::copy() const
 
 int FunctionExpression::priority() const
 {
-    return 0;
+    return 20;
 }
 
 /**
@@ -1422,7 +1422,7 @@ Expression *VariableExpression::copy() const
 
 int VariableExpression::priority() const
 {
-    return 0;
+    return 20;
 }
 
 /**
@@ -1501,7 +1501,7 @@ std::string StringExpression::toString() const
 
 int StringExpression::priority() const
 {
-    return 0;
+    return 20;
 }
 
 /**
@@ -1613,7 +1613,7 @@ Expression *ConstantExpression::copy() const
 
 int ConstantExpression::priority() const
 {
-    return 0;
+    return 20;
 }
 
 TYPESYSTEM_SOURCE_ABSTRACT(App::BooleanExpression, App::NumberExpression);
@@ -1667,7 +1667,7 @@ Expression *RangeExpression::copy() const
 
 int RangeExpression::priority() const
 {
-    return 0;
+    return 20;
 }
 
 void RangeExpression::getDeps(std::set<ObjectIdentifier> &props) const
