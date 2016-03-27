@@ -290,6 +290,8 @@ class SpreadsheetCases(unittest.TestCase):
         sheet.set('A5', '=(4mm)^2')
         sheet.set('A6', '=5(mm^2)')
         sheet.set('A7', '=5mm^2') #  ^2 operates on whole number
+        sheet.set('A8', '=5')
+        sheet.setDisplayUnit('A8', '1/K')
         self.doc.recompute()
         self.assertEqual(sheet.A1, Quantity('5mm'))
         self.assertEqual(sheet.A2, Quantity('-1 mm'))
@@ -334,6 +336,11 @@ class SpreadsheetCases(unittest.TestCase):
         sheet.set('A29', '=3 / 4 / 2')
         sheet.set('A30', '=3 / (4 / 2)')
         sheet.set('A31', '=(3 / 4) / 2')
+        sheet.set('A32', '=pi * 3')
+        sheet.set('A33', '=A32 / 3')
+        sheet.set('A34', '=1 < 2 ? <<A>> : <<B>>')
+        sheet.set('A35', '=min(A32:A33)')
+        sheet.set('A36', '=(1 < 2 ? 0 : 1) * 3')
         self.doc.recompute()
         self.assertEqual(sheet.getContents("A1"), "=1 < 2 ? 3 : 4")
         self.assertEqual(sheet.getContents("A2"), "=1 + 2 < 3 + 4 ? 5 + 6 : 7 + 8")
@@ -400,7 +407,12 @@ class SpreadsheetCases(unittest.TestCase):
         self.assertEqual(sheet.getContents('A29'), '=3 / 4 / 2')
         self.assertEqual(sheet.getContents('A30'), '=3 / (4 / 2)')
         self.assertEqual(sheet.getContents('A31'), '=3 / 4 / 2')
-
+        self.assertEqual(sheet.getContents('A32'), '=pi * 3')
+        self.assertEqual(sheet.getContents('A33'), '=A32 / 3')
+        self.assertEqual(sheet.getContents('A34'), '=1 < 2 ? <<A>> : <<B>>')
+        self.assertEqual(sheet.getContents('A35'), '=min(A32:A33)')
+        self.assertEqual(sheet.getContents('A36'), '=(1 < 2 ? 0 : 1) * 3')
+        
     def testRemoveRows(self):
         """ Removing rows -- check renaming of internal cells """
         sheet = self.doc.addObject('Spreadsheet::Sheet','Spreadsheet')
