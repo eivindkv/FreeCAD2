@@ -30,10 +30,10 @@ namespace App {
 struct CellAddress;
 
 AppExport CellAddress stringToAddress(const char *strAddress);
-int decodeColumn(const std::string &colstr);
-int decodeRow(const std::string &rowstr);
-int validColumn(const std::string &colstr);
-int validRow(const std::string &rowstr);
+AppExport int decodeColumn(const std::string &colstr);
+AppExport int decodeRow(const std::string &rowstr);
+AppExport int validColumn(const std::string &colstr);
+AppExport int validRow(const std::string &rowstr);
 
 struct AppExport CellAddress {
 
