@@ -246,6 +246,12 @@ public:
 
     virtual void visit(ExpressionVisitor & v);
 
+    Operator getOperator() const { return op; }
+
+    Expression * getLeft() const { return left; }
+
+    Expression * getRight() const { return right; }
+
 protected:
 
     virtual bool isCommutative() const;
