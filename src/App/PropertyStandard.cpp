@@ -37,6 +37,7 @@
 #include <Base/Writer.h>
 #include <Base/Stream.h>
 #include <Base/Quantity.h>
+#include <Base/Tools.h>
 
 #include "PropertyStandard.h"
 #include "MaterialPy.h"
@@ -241,7 +242,7 @@ void PropertyPath::setPyObject(PyObject *value)
 
 void PropertyPath::Save (Base::Writer &writer) const
 {
-    std::string val = encodeAttribute(_cValue.string());
+    std::string val = Base::Tools::encodeAttribute(_cValue.string());
     writer.Stream() << writer.ind() << "<Path value=\"" <<  val <<"\"/>" << std::endl;
 }
 
@@ -375,7 +376,7 @@ void PropertyEnumeration::Save(Base::Writer &writer) const
         writer.Stream() << writer.ind() << "<CustomEnumList count=\"" <<  items.size() <<"\">" << endl;
         writer.incInd();
         for(std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
-            std::string val = encodeAttribute(*it);
+            std::string val = Base::Tools::encodeAttribute(*it);
             writer.Stream() << writer.ind() << "<Enum value=\"" <<  val <<"\"/>" << endl;
         }
         writer.decInd();
@@ -1323,7 +1324,7 @@ void PropertyString::setPyObject(PyObject *value)
 
 void PropertyString::Save (Base::Writer &writer) const
 {
-    std::string val = encodeAttribute(_cValue);
+    std::string val = Base::Tools::encodeAttribute(_cValue);
     writer.Stream() << writer.ind() << "<String value=\"" <<  val <<"\"/>" << std::endl;
 }
 
@@ -1609,7 +1610,7 @@ void PropertyStringList::Save (Base::Writer &writer) const
     writer.Stream() << writer.ind() << "<StringList count=\"" <<  getSize() <<"\">" << endl;
     writer.incInd();
     for(int i = 0;i<getSize(); i++) {
-        std::string val = encodeAttribute(_lValueList[i]);
+        std::string val = Base::Tools::encodeAttribute(_lValueList[i]);
         writer.Stream() << writer.ind() << "<String value=\"" <<  val <<"\"/>" << endl;
     }
     writer.decInd();
@@ -1784,7 +1785,7 @@ void PropertyMap::Save (Base::Writer &writer) const
     writer.Stream() << writer.ind() << "<Map count=\"" <<  getSize() <<"\">" << endl;
     writer.incInd();
     for (std::map<std::string,std::string>::const_iterator it = _lValueList.begin();it!= _lValueList.end(); ++it) 
-        writer.Stream() << writer.ind() << "<Item key=\"" <<  it->first <<"\" value=\"" <<  encodeAttribute(it->second) <<"\"/>" << endl;
+        writer.Stream() << writer.ind() << "<Item key=\"" <<  Base::Tools::encodeAttribute(it->first) <<"\" value=\"" <<  Base::Tools::encodeAttribute(it->second) <<"\"/>" << endl;
 
     writer.decInd();
     writer.Stream() << writer.ind() << "</Map>" << endl ;
