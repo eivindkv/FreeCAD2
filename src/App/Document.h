@@ -31,6 +31,7 @@
 #include "PropertyContainer.h"
 #include "PropertyStandard.h"
 #include "PropertyLinks.h"
+#include "PropertyDocumentMaterialSource.h"
 
 #include <map>
 #include <vector>
@@ -53,6 +54,7 @@ namespace App
     class DocumentPy; // the python document class
     class Application;
     class Transaction;
+    class MaterialDatabase;
 }
 
 namespace App
@@ -93,14 +95,14 @@ public:
     App::PropertyString  LicenseURL;
     /// Meta descriptons
     App::PropertyMap     Meta;
-    /// Material descriptons, used and defined in the Material module.
-    App::PropertyMap     Material;
     /// read-only name of the temp dir created wen the document is opened
     PropertyString		TransientDir;
 	/// Tip object of the document (if any)
 	PropertyLink		Tip;
  	/// Tip object of the document (if any)
 	PropertyString		TipName;
+	/// Material source
+	PropertyDocumentMaterialSource Materials;
     //@}
 
     /** @name Signals of the document */
@@ -306,6 +308,9 @@ public:
     //void setChanged(DocumentObject* change);
     //@}
 
+    /** Material handling */
+    MaterialDatabase & getMaterialDatabase();
+
     /// Function called to signal that an object identifier has been renamed
     void renameObjectIdentifiers(const std::map<App::ObjectIdentifier, App::ObjectIdentifier> & paths);
 
@@ -322,6 +327,9 @@ public:
     virtual ~Document();
 
 protected:
+
+   // DocumentMaterialSource MaterialSource;
+
     /// Construction
     Document(void);
 
@@ -344,7 +352,6 @@ protected:
     /// refresh the internal dependency graph
     void _rebuildDependencyList(void);
     std::string getTransientDirectoryName(const std::string& uuid, const std::string& filename) const;
-
 
 private:
     // # Data Member of the document +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
