@@ -57,6 +57,7 @@ recompute path. Also enables more complicated dependencies beyond trees.
 # include <climits>
 #endif
 
+#include <memory>
 #include <boost/graph/topological_sort.hpp>
 #include <boost/graph/depth_first_search.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -75,6 +76,8 @@ recompute path. Also enables more complicated dependencies beyond trees.
 #include "DocumentObject.h"
 #include "MergeDocuments.h"
 #include <App/DocumentPy.h>
+#include <App/MaterialDatabase.h>
+#include <App/DocumentMaterialSource.h>
 
 #include <Base/Console.h>
 #include <Base/Exception.h>
@@ -146,6 +149,7 @@ struct DocumentP
     unsigned int UndoMaxStackSize;
     DependencyList DepList;
     std::map<DocumentObject*,Vertex> VertexObjectList;
+    std::unique_ptr<MaterialDatabase> materialDatabase;
 
     DocumentP() {
         activeObject = 0;
@@ -867,7 +871,7 @@ Document::Document(void)
     ADD_PROPERTY_TYPE(Company,(AuthorComp.c_str()),0,Prop_None,"Additional tag to save the the name of the company");
     ADD_PROPERTY_TYPE(Comment,(""),0,Prop_None,"Additional tag to save a comment");
     ADD_PROPERTY_TYPE(Meta,(),0,Prop_None,"Map with additional meta information");
-    ADD_PROPERTY_TYPE(Material,(),0,Prop_None,"Map with material properties");
+    //ADD_PROPERTY_TYPE(MaterialSource,(),0,Prop_None,"Map with material properties");
     // create the uuid for the document
     Base::Uuid id;
     ADD_PROPERTY_TYPE(Id,(""),0,Prop_None,"ID of the document");
@@ -937,6 +941,8 @@ Document::Document(void)
         "Link of the tip object of the document");
     ADD_PROPERTY_TYPE(TipName,(""),0,PropertyType(Prop_Hidden|Prop_ReadOnly),
         "Link of the tip object of the document");
+
+    ADD_PROPERTY_TYPE(Materials, (), 0, PropertyType(Prop_Hidden), "Material source");
     Uid.touch();
 }
 
@@ -1631,6 +1637,18 @@ Document::getDependencyList(const std::vector<App::DocumentObject*>& objs) const
     for (std::set<Vertex>::iterator it = out.begin(); it != out.end(); ++it)
         ary.push_back(VertexMap[*it]);
     return ary;
+}
+
+App::MaterialDatabase &Document::getMaterialDatabase()
+{
+    if (!d->materialDatabase) {
+        MaterialDatabase * parent = &App::GetApplication().getMaterialDatabase();
+
+        d->materialDatabase = std::unique_ptr<MaterialDatabase>(new MaterialDatabase(parent));
+        d->materialDatabase->addMaterialSource(Materials.getValue());
+    }
+
+    return *d->materialDatabase;
 }
 
 /**
