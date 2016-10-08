@@ -108,12 +108,12 @@
 #include "OriginFeature.h"
 #include "Origin.h"
 #include "MaterialObject.h"
+#include "MaterialDatabase.h"
+#include "FileMaterialSource.h"
 #include "DefaultMaterialSource.h"
 #include "Expression.h"
 #include "Transactions.h"
 #include <App/MaterialPy.h>
-#include "MaterialDatabasePy.h"
-#include "FileMaterialSourcePy.h"
 
 // If you stumble here, run the target "BuildExtractRevision" on Windows systems
 // or the Python script "SubWCRev.py" on Linux based systems which builds
